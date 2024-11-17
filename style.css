@@ -1,0 +1,119 @@
+
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: white;
+    color: #111;
+}<style>
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: white;
+    color: #111;
+}
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    border-bottom: 1px solid #ddd;
+}
+header h1 {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+    color: #111;
+    letter-spacing: 1px;
+}
+header a {
+    text-decoration: none;
+    color: #555;
+    font-size: 14px;
+}
+header a:hover {
+    color: #000;
+}
+.hero {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+.hero img {
+    width: 150px;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.hero .text {
+    margin-left: 20px;
+    max-width: 600px;
+}
+.hero h2 {
+    font-size: 28px;
+    margin: 0 0 10px;
+}
+.hero p {
+    font-size: 16px;
+    color: #555;
+}
+section {
+    text-align: center;
+    padding: 20px 0;
+}
+section h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+.game {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+}
+.game img {
+    width: 120px;
+    height: 120px;
+    border-radius: 15px;
+    margin: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.game .info {
+    margin: 0 20px;
+    text-align: left;
+}
+.game h3 {
+    font-size: 20px;
+    margin: 10px 0;
+}
+.game p {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 10px;
+}
+.game a {
+    display: inline-block;
+    background-image: url('googleplay.png');
+    background-size: contain; /* Полностью помещает изображение в элемент */
+    background-repeat: no-repeat;
+    background-position: center;
+    color: white;
+    padding: 10px 20px;
+    margin-top: -20px;
+    width: 200px; /* Задайте ширину кнопки */
+    height: 120px; /* Задайте высоту кнопки */
+}
+.game:hover {
+    transform: translateY(-5px); /* Подъем при наведении */
+}
+.footer {
+    text-align: center;
+    padding: 20px;
+    background: #f0f0f0;
+    margin-top: 20px;
+}
+
+.footer a {
+    color: #4A90E2;
+    text-decoration: none;
+}
