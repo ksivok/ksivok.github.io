@@ -4,73 +4,98 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy Policy - Ksivok Games</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="/favicon.png" type="image/png">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            background-color: #f4f4f4;
-            color: #333;
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            background: #fff;
-        }
-        h1, h2 {
-            color: #0073e6;
-        }
-        a {
-            color: #0073e6;
-            text-decoration: none;
-        }
+    body, .hero-text, .game-info, .games, .footer-content, .footer-section, .footer-bottom {
+        font-family: Arial, sans-serif !important;
+    }
+    .logo, .nav-links a, h1, h2 {
+        font-family: 'Digitalt', 'Roboto', sans-serif !important;
+    }
     </style>
 </head>
 <body>
-<h1>Privacy Policy for our games</h1>
-<p><strong>Effective Date:</strong> 16.11.2024</p>
-
-<p>We, the developers of the Find A Letter and Memory Pairs games, respect users' right to privacy. This Privacy Policy explains how we handle user data, including any data shared with Google Play Games Services, Firebase, and third-party advertising services in our game. Please read this policy carefully.</p>
-
-<h2>1. Data Collection</h2>
-<p>Find A Letter and Memory Pairs collects minimal user data for the following purposes:</p>
-<ul>
-    <li><strong>Google Play Games Services:</strong> When signing in with a Google account to use achievements and leaderboards, Google may collect information associated with your account, such as your unique user ID and in-game achievements. We do not have access to this personal information directly.</li>
-    <li><strong>Firebase Analytics:</strong> We use Firebase Analytics to collect anonymous statistics about user interactions with the app. This helps us improve functionality and the overall user experience. Firebase data collection complies with Google's <a href="https://firebase.google.com/support/privacy" target="_blank">Privacy Policy</a>.</li>
-    <li><strong>Advertising:</strong> We use Google AdMob, which may collect non-personal information about your device (such as device model, operating system type, and advertising identifier) to show relevant ads.</li>
-</ul>
-
-<h2>2. Data Use</h2>
-<p>The data collected is used only for the following purposes:</p>
-<ul>
-    <li><strong>Google Play Games Services:</strong> To enable features such as achievements, leaderboards, and sign-in with Google. Data associated with these services is managed by Google under their <a href="https://policies.google.com/privacy" target="_blank">Privacy Policy</a>.</li>
-    <li><strong>Firebase Analytics:</strong> To analyze app performance and improve the user experience.</li>
-    <li><strong>Advertising:</strong> Data collected by Google AdMob is used to display relevant ads and is subject to Google’s Privacy Policy.</li>
-</ul>
-
-<h2>3. Advertising</h2>
-<p>We use Google AdMob to display ads in the game. Ads may be contextual and are not personalized if the game targets children, in compliance with Google Play's “Families” policy. More information on data collection by AdMob is available at the <a href="https://policies.google.com/privacy" target="_blank">Google Privacy Policy</a>.</p>
-
-<h2>4. Data Sharing with Third Parties</h2>
-<p>We do not directly share user data. However, Google Play Games Services, Firebase, and Google AdMob may collect data as described above. This data is managed under Google's Privacy Policy.</p>
-
-<h2>5. User Rights</h2>
-<p>Users have the right to control their Google Play Games sign-in and ad preferences through their Google account settings. You may also manage ads by adjusting your device settings, such as limiting the use of the advertising identifier.</p>
-
-<h2>6. Data Security</h2>
-<p>We prioritize secure interactions with third-party services. Firebase and Google AdMob use encrypted connections and modern security protocols to protect data. Learn more about Firebase's security measures in their <a href="https://firebase.google.com/support/privacy" target="_blank">Privacy Policy</a>.</p>
-
-<h2>7. Children's Privacy</h2>
-<p>We comply with Google Play's “Families” policy and laws for protecting children’s data, such as COPPA. We do not intentionally collect data from children under 13, and ads are configured to meet these requirements.</p>
-
-<h2>8. Changes to the Privacy Policy</h2>
-<p>We may update this Privacy Policy periodically. Updates will be posted on this page, with the effective date noted. We encourage you to review this page regularly for any changes.</p>
-
-<h2>9. Compliance with GDPR and CCPA</h2>
-<p>We respect user rights granted by GDPR and CCPA. Users can request data deletion by contacting us. We will assist in accordance with third-party service policies, such as Google AdMob and Firebase.</p>
-
-<h2>10. Contact Us</h2>
-<p>If you have any questions about this Privacy Policy or the data used in the game, please contact us at:</p>
-<p>Email: <a href="mailto:ksivok@gmail.com">ksivok@gmail.com</a></p>
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="logo">KSIVOK GAMES</div>
+            <div class="nav-links">
+                <a href="index.html#games">Games</a>
+                <a href="index.html#about">About</a>
+                <a href="privacy.html">Privacy</a>
+            </div>
+        </div>
+    </nav>
+    <section class="hero" id="policy">
+      <div style="text-align: center;" class="hero-text">
+                <h1>Privacy Policy</h1>
+                <p><strong>Effective Date:</strong> 16.11.2024</p>
+                <p>We, the developers of the Find A Letter and Memory Pairs games, respect users' right to privacy. This Privacy Policy explains how we handle user data, including any data shared with Google Play Games Services, Firebase, and third-party advertising services in our game. Please read this policy carefully.</p>
+        </div>
+    </section>
+    <section class="games" style="max-width: 800px; margin: 0 auto;">
+        <div class="game-info">
+            <h2>1. Data Collection</h2>
+            <ul>
+                <li><strong>Google Play Games Services:</strong> When signing in with a Google account to use achievements and leaderboards, Google may collect information associated with your account, such as your unique user ID and in-game achievements. We do not have access to this personal information directly.</li>
+                <li><strong>Firebase Analytics:</strong> We use Firebase Analytics to collect anonymous statistics about user interactions with the app. This helps us improve functionality and the overall user experience. Firebase data collection complies with Google's <a href="https://firebase.google.com/support/privacy" target="_blank">Privacy Policy</a>.</li>
+                <li><strong>Advertising:</strong> We use Google AdMob, which may collect non-personal information about your device (such as device model, operating system type, and advertising identifier) to show relevant ads.</li>
+            </ul>
+            <br>
+            <h2>2. Data Use</h2>
+            <ul>
+                <li><strong>Google Play Games Services:</strong> To enable features such as achievements, leaderboards, and sign-in with Google. Data associated with these services is managed by Google under their <a href="https://policies.google.com/privacy" target="_blank">Privacy Policy</a>.</li>
+                <li><strong>Firebase Analytics:</strong> To analyze app performance and improve the user experience.</li>
+                <li><strong>Advertising:</strong> Data collected by Google AdMob is used to display relevant ads and is subject to Google's Privacy Policy.</li>
+            </ul>
+            <br>
+            <h2>3. Advertising</h2>
+            <p>We use Google AdMob to display ads in the game. Ads may be contextual and are not personalized if the game targets children, in compliance with Google Play's "Families" policy. More information on data collection by AdMob is available at the <a href="https://policies.google.com/privacy" target="_blank">Google Privacy Policy</a>.</p>
+            <br>
+            <h2>4. Data Sharing with Third Parties</h2>
+            <p>We do not directly share user data. However, Google Play Games Services, Firebase, and Google AdMob may collect data as described above. This data is managed under Google's Privacy Policy.</p>
+            <br>
+            <h2>5. User Rights</h2>
+            <p>Users have the right to control their Google Play Games sign-in and ad preferences through their Google account settings. You may also manage ads by adjusting your device settings, such as limiting the use of the advertising identifier.</p>
+            <br>
+            <h2>6. Data Security</h2>
+            <p>We prioritize secure interactions with third-party services. Firebase and Google AdMob use encrypted connections and modern security protocols to protect data. Learn more about Firebase's security measures in their <a href="https://firebase.google.com/support/privacy" target="_blank">Privacy Policy</a>.</p>
+            <br>
+            <h2>7. Children's Privacy</h2>
+            <p>We comply with Google Play's "Families" policy and laws for protecting children's data, such as COPPA. We do not intentionally collect data from children under 13, and ads are configured to meet these requirements.</p>
+            <br>
+            <h2>8. Changes to the Privacy Policy</h2>
+            <p>We may update this Privacy Policy periodically. Updates will be posted on this page, with the effective date noted. We encourage you to review this page regularly for any changes.</p>
+            <br>
+            <h2>9. Compliance with GDPR and CCPA</h2>
+            <p>We respect user rights granted by GDPR and CCPA. Users can request data deletion by contacting us. We will assist in accordance with third-party service policies, such as Google AdMob and Firebase.</p>
+            <br>
+            <h2>10. Contact Us</h2>
+            <p>If you have any questions about this Privacy Policy or the data used in the game, please contact us at:</p>
+            <p>Email: <a href="mailto:ksivok@gmail.com">ksivok@gmail.com</a></p>
+        </div>
+    </section>
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <p>Email: <a href="mailto:ksivok@gmail.com">ksivok@gmail.com</a></p>
+            </div>
+            <div class="footer-section">
+                <h3>Follow</h3>
+                <div class="social-links">
+                    <a href="https://www.youtube.com/@ksivok-games/shorts" target="_blank" aria-label="Youtube Shorts">Youtube Shorts</a>
+                    <a href="https://www.linkedin.com/in/andrey-panteleev-b9366a114/" target="_blank" aria-label="Linkedin">Linkedin</a>
+                    <a href="https://play.google.com/store/apps/dev?id=6354794172519144529" target="_blank" aria-label="Google Play">Google Play</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; <span id="year"></span> Ksivok Games. All rights reserved.</p>
+        </div>
+    </footer>
+    <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
 </body>
 </html>
