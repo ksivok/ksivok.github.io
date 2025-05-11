@@ -4,51 +4,105 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ksivok Games</title>
+    <meta name="description" content="Discover exciting mobile games by Andrey - Find A Letter and Memory Pairs Game. Fast-paced letter finding and memory matching games for Android.">
+    <meta name="keywords" content="mobile games, android games, find a letter, memory pairs, ksivok games">
+    <meta property="og:title" content="Ksivok Games">
+    <meta property="og:description" content="Discover exciting mobile games by Andrey - Find A Letter and Memory Pairs Game.">
+    <meta property="og:image" content="game1.png">
+    <meta property="og:url" content="https://findaletter.github.io">
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="/favicon.png" type="image/png">
     <meta name="google-site-verification" content="waR8D4ip7t6BubK5UE8GR7LkjRyi_qyG5uVl_xgybJM" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .hero-text p {
+            font-size: 1.25rem;
+            line-height: 1.6;
+        }
+
+        .game-info p {
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+    </style>
 </head>
 <body>
-
-<header>
-    <h1>KSIVOK GAMES</h1>
-    <a href="privacy.html">Privacy policy</a>
-</header>
-
-<div class="hero">
-    <img src="mpscreen.jpg" alt="Memory Pairs Game">
-    <div class="text">
-        <h2>Hi, I'm Andrey, a solo developer!</h2>
-        <p>Currently, I'm working on "Find A Letter" and "Memory Pairs" Android games. Join in and give it a try!</p>
-    </div>
-</div>
-
-<section>
-    <h2>MY GAMES</h2>
-    <div class="game">
-        <img src="game1.png" alt="Find A Letter">
-        <div class="info">
-            <h3>Find A Letter</h3>
-            <p>Find A Letter is a fast-paced game where you quickly find the target letter.</p>
-            <a href="https://play.google.com/store/apps/details?id=com.findletter" target="_blank"></a>
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="logo">KSIVOK GAMES</div>
+            <div class="nav-links">
+                <a href="#games">Games</a>
+                <a href="#about">About</a>
+                <a href="privacy.html">Privacy</a>
+            </div>
         </div>
-    </div>
-    <div class="game">
-        <img src="game2.png" alt="Memory Pairs Game">
-        <div class="info">
-            <h3>Memory Pairs Game</h3>
-            <p>Match unique pairs of flags, emojis, and more! Test your memory and speed!</p>
-            <a href="https://play.google.com/store/apps/details?id=com.ap.ksivok.games.memorypairs" target="_blank" ></a>
-        </div>
-    </div>
+    </nav>
 
-    <div class="footer">
-        <div class="info">
-            <h3>Contacts</h3>
-            <p>email: <a href="mailto:ksivok@gmail.com">ksivok@gmail.com</a></p>
-        </div>
-    </div>
-</section>
+    <section class="hero" id="about">
+        <center><div class="hero-content">
+            <div class="hero-text">
+                <h1>Hi! I'm Andrey, an indie mobile game developer.</h1>
+                <p>Check out my games: Find A Letter and Match All Pairs!</p>
+                <p>Boost your memory and attention with Find A Letter and Match All Pairs.</p>
+            </div>
+            <div class="hero-image">
+                <img src="mpscreen.jpg" alt="Memory Pairs Game">
+                <img src="mpscreen2.jpg" alt="Memory Pairs Game">
+            </div>
+        </div></center>
+    </section>
 
+    <section class="games" id="games">
+        <h2>MY GAMES</h2>
+        <div class="games-grid">
+            <div class="game-card">
+                <div class="game-image">
+                    <img src="game1.png" alt="Find A Letter">
+                </div>
+                <div class="game-info">
+                    <h2>Find A Letter</h2>
+                    <p>Find A Letter is a fun and engaging game where players must quickly spot and select a specific letter hidden among a grid of random letters. With various difficulty levels and a timer to race against, it's perfect for sharpening your visual skills and speed!</p>
+                    <a href="https://play.google.com/store/apps/details?id=com.findletter" target="_blank" class="cta-button"><img src="googleplay.png" alt="Download on Google Play"></a>
+                </div>
+            </div>
+            
+            <div class="game-card">
+                <div class="game-image">
+                    <img src="game2.png" alt="Memory Pairs Game">
+                </div>
+                <div class="game-info">
+                    <h2>Match All Pairs: Memory Game</h2>
+                    <p>Match cards, train your memory, and boost your brain! A fun and addictive memory game where you match flags, emojis, animals, and more! Perfect for all ages, from kids to adults. Challenge yourself with different grid sizes and special game modes!</p>
+                    <a href="https://play.google.com/store/apps/details?id=com.ap.ksivok.games.memorypairs" target="_blank" class="cta-button"><img src="googleplay.png" alt="Download on Google Play"></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <p>Email: <a href="mailto:ksivok@gmail.com">ksivok@gmail.com</a></p>
+            </div>
+            <div class="footer-section">
+                <h3>Follow</h3>
+                <div class="social-links">
+                    <a href="https://www.youtube.com/@ksivok-games/shorts" target="_blank" aria-label="Youtube Shorts">Youtube Shorts</a>
+                    <a href="https://www.linkedin.com/in/andrey-panteleev-b9366a114/" target="_blank" aria-label="Linkedin">Linkedin</a>
+                    <a href="https://play.google.com/store/apps/dev?id=6354794172519144529" target="_blank" aria-label="Google Play">Google Play</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; <span id="year"></span> Ksivok Games. All rights reserved.</p>
+        </div>
+    </footer>
+    <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
 </body>
 </html>
