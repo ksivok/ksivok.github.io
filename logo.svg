@@ -1,0 +1,29 @@
+<svg width="500" height="500" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad-main" x1="250" y1="50" x2="250" y2="450" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#7c3aed" />
+      <stop offset="100%" stop-color="#f43f5e" />
+    </linearGradient>
+    <filter id="inner-glow">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Внешняя оболочка кристалла -->
+  <path d="M250 50L430 150V350L250 450L70 350V150L250 50Z" fill="url(#grad-main)" fill-opacity="0.15" stroke="url(#grad-main)" stroke-width="4" />
+
+  <!-- Внутренние грани (создают объем) -->
+  <path d="M250 50V250L430 150M250 450V250L70 350M70 150L250 250L430 350" stroke="url(#grad-main)" stroke-width="2" stroke-opacity="0.5" />
+
+  <!-- Центральное светящееся ядро -->
+  <g filter="url(#inner-glow)">
+    <path d="M250 150L336.6 200V300L250 350L163.4 300V200L250 150Z" fill="url(#grad-main)" />
+    <!-- Блик на ядре -->
+    <path d="M250 170L300 200V240L250 210L200 240V200L250 170Z" fill="white" fill-opacity="0.3" />
+  </g>
+
+  <!-- Декоративные орбиты -->
+  <circle cx="250" cy="250" r="210" stroke="#38bdf8" stroke-width="1" stroke-dasharray="10 20" stroke-opacity="0.3" />
+</svg>
