@@ -266,12 +266,13 @@ body {
     transform: scale(1.05);
 }
 
-.web-button {
+.web-button,
+.web-button:visited {
     background: linear-gradient(135deg, #9747ff 0%, #682eb2 100%);
-    color: var(--white);
+    color: #ffffff !important;
     padding: 10px 22px;
     border-radius: 10px;
-    text-decoration: none;
+    text-decoration: none !important;
     font-size: 0.95rem;
     font-weight: bold;
     display: inline-flex;
@@ -284,9 +285,10 @@ body {
 
 .web-button:hover {
     background: linear-gradient(135deg, #aa76ff 0%, #9747ff 100%);
-    color: var(--white);
+    color: #ffffff !important;
     transform: scale(1.05);
     box-shadow: 0 6px 16px rgba(151, 71, 255, 0.5);
+    text-decoration: none !important;
 }
 
 /* Footer */
