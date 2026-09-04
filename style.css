@@ -294,8 +294,10 @@ body {
 .game-buttons {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 12px;
+    row-gap: 12px;
     align-items: center;
+    margin-top: 10px;
 }
 
 /* Footer */
