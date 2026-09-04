@@ -291,6 +291,13 @@ body {
     text-decoration: none !important;
 }
 
+.game-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
 /* Footer */
 footer {
     background-color: var(--light-bg);
@@ -406,5 +413,9 @@ footer {
 
     .game-info h2 {
         text-align: center !important;
+    }
+
+    .game-buttons {
+        justify-content: center;
     }
 }
