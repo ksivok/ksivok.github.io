@@ -183,6 +183,16 @@ body {
     gap: 3rem;
 }
 
+.platform-title {
+    grid-column: 1 / -1;
+    margin: 1rem 0 -1rem;
+    padding-bottom: 0.75rem;
+    color: var(--secondary-color);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    font-size: 1.4rem;
+    letter-spacing: 3px;
+}
+
 .game-card {
     background: var(--light-bg);
     border-radius: 20px;
