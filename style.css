@@ -462,13 +462,12 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .game-tags { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 1.5rem 0; }
 .game-tags span, .status-badge { display: inline-block; padding: 0.35rem 0.75rem; border: 1px solid #526c57; border-radius: 100px; color: #c8edbb; font-size: 0.85rem; font-weight: 700; }
 .status-badge { margin-bottom: 1rem; }
-.garden-title-panel { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1rem; min-height: 330px; padding: 2rem; text-align: center; background: radial-gradient(ellipse at 15% 10%, #44634b 0%, transparent 60%), linear-gradient(145deg, #294833, #172d28); border: 1px solid #527254; border-radius: 20px; color: #dcedd6; overflow: hidden; }
-.garden-symbol { color: #e9ce82; font-size: 5rem; line-height: 1; }
-.garden-wordmark { font-family: 'Digitalt', sans-serif; font-size: clamp(1.8rem, 4vw, 3.3rem); letter-spacing: 0.05em; color: #e5f0cf; line-height: 1.1; overflow-wrap: anywhere; }
+.garden-card-art { display: block; min-height: 320px; background: #172d28; }
+.garden-card-art img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: left center; }
 .garden-button, .garden-button:visited { background: #b5e5ab; color: #132b1c !important; box-shadow: none; }
 .garden-button:hover { background: #c8edbb; color: #132b1c !important; box-shadow: 0 4px 16px #0003; }
-.featured-game { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.25fr); align-items: stretch; }
-.featured-game .garden-title-panel { border: 0; border-radius: 0; }
+.featured-game { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: stretch; }
+.featured-game .store-badge { margin-bottom: 1rem; }
 .featured-game .game-info { min-width: 0; align-self: center; }
 .feature-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; margin-top: 2rem; }
 .feature-panel, .contact-panel { min-width: 0; background: var(--light-bg); border: 1px solid #ffffff15; border-radius: 18px; padding: 1.75rem; }
@@ -492,6 +491,11 @@ button.web-button:disabled { opacity: 0.55; cursor: not-allowed; transform: none
 .form-note, .game-info p.form-note { font-size: 0.9rem; color: #b0bdd0; line-height: 1.6; }
 .form-status { padding: 1rem; margin-top: 1.5rem; background: #0f172a; border-left: 3px solid var(--secondary-color); border-radius: 6px; }
 .privacy-note { margin-top: 1.25rem; margin-bottom: 0 !important; }
+.captcha-field { margin: 0 0 1.25rem; }
+.captcha-field > p { font-weight: 700; margin-bottom: 0.75rem; }
+.form-status[data-state="success"] { border-color: #b5e5ab; color: #e0f5dc; background: #193929; font-weight: 700; }
+.form-status[data-state="error"] { border-color: #fb7185; color: #ffe4e8; background: #38202a; }
+.form-status[data-state="pending"] { border-color: #e9ce82; }
 .email-link { display: inline-block; font-size: 1.2rem; color: var(--secondary-color); margin-bottom: 1rem; overflow-wrap: anywhere; }
 .feature-list { margin: 0 0 1rem 1.25rem; }
 .feature-list li { margin-bottom: 0.5rem; }
@@ -512,7 +516,7 @@ button.web-button:disabled { opacity: 0.55; cursor: not-allowed; transform: none
     [id] { scroll-margin-top: 13rem; }
     .featured-game, .feature-grid, .form-row { grid-template-columns: 1fr; }
     .featured-game .game-info { padding: 1.5rem; }
-    .featured-game .garden-title-panel { min-height: 230px; }
+    .garden-card-art { min-height: 0; aspect-ratio: 920 / 430; }
     .garden-copy .game-buttons { justify-content: flex-start; }
     .contact-panel, .feature-panel, .release-panel { padding: 1.25rem; }
     .page-section { margin-top: 3rem; }
