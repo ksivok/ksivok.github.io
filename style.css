@@ -521,3 +521,27 @@ button.web-button:disabled { opacity: 0.55; cursor: not-allowed; transform: none
     *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
     .game-card:hover, .logo:hover img, .web-button:hover { transform: none !important; }
 }
+/* Gardenkin page: key-art banner, Steam badge and screenshot gallery. */
+.garden-banner { position: relative; display: flex; align-items: center; min-height: clamp(380px, 48vw, 560px); padding: clamp(1.5rem, 4vw, 3rem); border-radius: 22px; overflow: hidden; border: 1px solid #527254; background: linear-gradient(90deg, rgba(10, 24, 18, 0.88) 0%, rgba(10, 24, 18, 0.6) 42%, rgba(10, 24, 18, 0.05) 75%), url("images/gardenkin/hero.webp") center / cover no-repeat, #172d28; }
+.garden-banner-copy { max-width: 560px; }
+.garden-banner h1 { margin-bottom: 0.75rem; line-height: 0; }
+.garden-logo { display: block; width: min(100%, 460px); height: auto; filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.55)); }
+.garden-banner .page-lead { color: #f3f7ea; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.65); }
+.garden-banner .game-tags span { background: rgba(10, 24, 18, 0.55); }
+.store-badge { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.7rem 1.2rem; border-radius: 999px; background: rgba(15, 29, 43, 0.85); border: 1px solid #66c0f4; color: var(--white); font-weight: 700; }
+.store-badge-label { color: #9fd3f3; font-weight: 400; }
+.garden-story, .support-panel { max-width: 820px; }
+.shot-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; margin-top: 2rem; }
+.shot { margin: 0; min-width: 0; background: var(--light-bg); border: 1px solid #ffffff15; border-radius: 16px; overflow: hidden; }
+.shot a { display: block; line-height: 0; overflow: hidden; }
+.shot img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; transition: transform 0.25s ease; }
+.shot a:hover img, .shot a:focus-visible img { transform: scale(1.03); }
+.shot figcaption { padding: 0.8rem 1rem 1rem; color: var(--text-muted); font-size: 0.95rem; }
+@media (max-width: 768px) {
+    .shot-grid { grid-template-columns: 1fr; }
+    .garden-banner { min-height: 0; padding-top: 11rem; background: linear-gradient(180deg, rgba(10, 24, 18, 0.05) 0%, rgba(10, 24, 18, 0.92) 52%), url("images/gardenkin/hero.webp") 70% top / auto 260px no-repeat, #172d28; }
+    .garden-banner .game-buttons { justify-content: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .shot a:hover img, .shot a:focus-visible img { transform: none; }
+}
