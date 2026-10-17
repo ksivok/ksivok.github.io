@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self'; form-action https://formspree.io; base-uri 'none'; object-src 'none'; upgrade-insecure-requests">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; connect-src 'self' https://formspree.io https://www.google.com/recaptcha/; frame-src https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self'; form-action https://formspree.io; base-uri 'none'; object-src 'none'; upgrade-insecure-requests">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>Contact &amp; Feedback | Ksivok Games</title>
     <meta name="description" content="Send Ksivok Games a question, game suggestion, or bug report. Contact the developer of Gardenkin and other independent games.">
     <link rel="canonical" href="https://ksivok-games.org/contact.html">
-    <link rel="stylesheet" href="style.css?v=1.4">
+    <link rel="stylesheet" href="style.css?v=1.5">
     <link rel="icon" href="favicon.png" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,17 +43,18 @@
                             <div class="form-field"><label for="topic">What is it about?</label><select id="topic" name="topic"><option value="feedback">Feedback / idea</option><option value="bug">Bug report</option><option value="question">Question</option><option value="business">Business enquiry</option><option value="privacy">Privacy / data request</option></select></div>
                         </div>
                         <div class="form-field"><label for="message">Your message *</label><textarea id="message" name="message" rows="8" maxlength="5000" required aria-describedby="message-help"></textarea><small id="message-help">For a bug report, please include your device, game version, and what happened. Up to 5,000 characters.</small></div>
+                        <div class="captcha-field"><p id="captcha-label">Spam protection *</p><div id="contact-captcha" data-sitekey="6LfyqfMtAAAAACIZ49mRh02kqPGEuXETaKo37tCw" aria-labelledby="captcha-label"></div></div>
                         <button id="contact-submit" type="submit" class="web-button" disabled>Send message</button>
                     </fieldset>
-                    <p id="form-status" class="form-status" role="status" aria-live="polite">Loading the contact form. If it does not become available, please email <a href="mailto:ksivok@gmail.com">ksivok@gmail.com</a>.</p>
+                    <p id="form-status" class="form-status" role="status" aria-live="polite" tabindex="-1">Loading the contact form. If it does not become available, please email <a href="mailto:ksivok@gmail.com">ksivok@gmail.com</a>.</p>
                     <noscript><p class="form-note">Please enable JavaScript to use the form, or email <a href="mailto:ksivok@gmail.com">ksivok@gmail.com</a> directly.</p></noscript>
-                    <p id="form-privacy" class="form-note privacy-note">Submitting opens Formspree's secure submission page, where a spam check may be requested. Your email, message, and any optional details are processed and stored by Formspree and emailed to Ksivok Games to handle your enquiry. Please do not send passwords, payment information, or other sensitive data. See our <a href="privacy.html#website-contact">contact privacy information</a> and <a href="https://formspree.io/legal/privacy-policy/" target="_blank" rel="noopener noreferrer">Formspree's privacy policy</a>.</p>
+                    <p id="form-privacy" class="form-note privacy-note">This form uses Google reCAPTCHA for spam protection; Google's <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a> apply. Your email, message, and any optional details are processed and stored by Formspree and emailed to Ksivok Games to handle your enquiry. Please do not send passwords, payment information, or other sensitive data. See our <a href="privacy.html#website-contact">contact privacy information</a> and <a href="https://formspree.io/legal/privacy-policy/" target="_blank" rel="noopener noreferrer">Formspree's privacy policy</a>.</p>
                 </form>
             </section>
             <aside class="contact-aside" aria-labelledby="email-title"><div class="contact-panel"><p class="eyebrow">Prefer your email app?</p><h2 id="email-title">Write directly</h2><a class="email-link" href="mailto:ksivok@gmail.com">ksivok@gmail.com</a><p>Questions about Gardenkin, feedback on any of my games, and collaboration ideas are all welcome.</p></div><div class="contact-panel"><h2>A useful bug report</h2><ul class="feature-list"><li>Game name and version, if you know it.</li><li>Your device and operating system.</li><li>Steps to reproduce the problem.</li><li>What you expected, and what happened instead.</li></ul><p class="form-note">There are no file uploads on this form. If a screenshot would help, mention it and I can follow up by email.</p></div></aside>
         </div>
     </main>
     <footer><div class="footer-content"><div class="footer-section"><h3>Ksivok Games</h3><p>Independent games by Andrey.</p><p><a href="index.html#games">Explore all games</a></p></div><div class="footer-section"><h3>Information</h3><p><a href="gardenkin.html">Gardenkin</a></p><p><a href="privacy.html">Privacy policy</a></p></div></div><div class="footer-bottom"><p>&copy; <span id="year"></span> Ksivok Games. All rights reserved.</p></div></footer>
-    <script src="site.js" defer></script>
+    <script src="site.js?v=1.5" defer></script>
 </body>
 </html>

@@ -8,15 +8,20 @@ const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const source = fs.readFileSync(path.join(root, 'site.js'), 'utf8');
-const { formEndpoint, selectedGame } = require(path.join(root, 'site.js'));
+const { formEndpoint, selectedGame, submissionAccepted } = require(path.join(root, 'site.js'));
 let passed = 0;
 let failed = 0;
 let checkedLinks = 0;
+const cases = [];
 
 function check(name, run) {
-    try { run(); passed++; console.log('PASS ' + name); }
-    catch (error) { failed++; console.error('FAIL ' + name + ': ' + error.message); }
+    cases.push({ name, run });
 }
+
+check('AJAX submission requires an explicit acceptance validator', () => {
+    assert.equal(typeof submissionAccepted, 'function', 'missing submissionAccepted helper');
+    assert.match(source, /\bfetch\s*\(/, 'submission must use the AJAX response');
+});
 
 function decode(value) {
     return value.replace(/&(?:amp|quot|apos|lt|gt|#\d+|#x[\da-f]+);/gi, entity => {
@@ -110,7 +115,7 @@ check('contact labels, required field names, and disabled fallback', () => {
     assert.ok(contact.tags.some(node => node.tag === 'a' && node.attrs.href === 'mailto:ksivok@gmail.com'));
 });
 
-check('native POST and restricted HTTPS form destination/CSP', () => {
+check('HTTPS fallback, explicit CAPTCHA configuration, and restricted CSP', () => {
     assert.equal(form.attrs.method.toLowerCase(), 'post');
     const id = form.attrs['data-formspree-id'];
     assert.equal(typeof id, 'string');
@@ -123,13 +128,19 @@ check('native POST and restricted HTTPS form destination/CSP', () => {
     assert.ok(meta, 'missing contact CSP');
     const policy = new Map(meta.attrs.content.split(';').map(part => part.trim().split(/\s+/)).filter(part => part[0]).map(([name, ...values]) => [name, values]));
     assert.deepEqual(policy.get('form-action'), ['https://formspree.io']);
-    for (const name of ['default-src', 'script-src']) assert.deepEqual(policy.get(name), ["'self'"]);
+    assert.deepEqual(policy.get('default-src'), ["'self'"]);
+    assert.deepEqual(policy.get('script-src')?.slice().sort(), ["'self'", 'https://www.google.com/recaptcha/', 'https://www.gstatic.com/recaptcha/'].sort());
+    assert.deepEqual(policy.get('connect-src')?.slice().sort(), ["'self'", 'https://formspree.io', 'https://www.google.com/recaptcha/'].sort());
+    assert.deepEqual(policy.get('frame-src')?.slice().sort(), ['https://www.google.com/recaptcha/', 'https://recaptcha.google.com/recaptcha/'].sort());
     for (const name of ['base-uri', 'object-src']) assert.deepEqual(policy.get(name), ["'none'"]);
+    assert.ok(!/unsafe-inline|unsafe-eval/.test(meta.attrs.content));
     assert.ok(!contact.tags.some(node => 'formaction' in node.attrs || 'onsubmit' in node.attrs));
     const scripts = contact.tags.filter(node => node.tag === 'script');
     assert.equal(scripts.length, 1);
-    assert.equal(scripts[0].attrs.src, 'site.js');
-    assert.ok(!/\b(?:fetch|XMLHttpRequest|sendBeacon)\s*\(/.test(source), 'unexpected request API');
+    assert.equal(new URL(scripts[0].attrs.src, 'https://ksivok-games.org/').pathname, '/site.js');
+    assert.equal(contact.byId('contact-captcha')?.attrs['data-sitekey'], '6LfyqfMtAAAAACIZ49mRh02kqPGEuXETaKo37tCw');
+    assert.ok(!/\.innerHTML\s*=/.test(source), 'status must use textContent, not HTML');
+    assert.ok(!/\b(?:XMLHttpRequest|sendBeacon)\s*\(/.test(source), 'unexpected request API');
 });
 
 check('endpoint validation rejects URL injection and malformed IDs', () => {
@@ -153,72 +164,336 @@ check('game prefill uses only actual select options', () => {
     assert.equal(selectedGame('?game=unknown&game=gardenkin', options), null);
 });
 
-function fixture(formId, search = '') {
+function response(payload = { next: 'https://formspree.io/thanks' }, overrides = {}) {
+    return Object.assign({
+        ok: true, status: 200, redirected: false, type: 'cors',
+        headers: { get: name => name.toLowerCase() === 'content-type' ? 'application/json; charset=utf-8' : null },
+        json: async () => payload
+    }, overrides);
+}
+
+check('acceptance validator requires successful JSON with Formspree thanks destination', () => {
+    assert.equal(typeof submissionAccepted, 'function', 'missing submissionAccepted helper');
+    for (const next of ['https://formspree.io/thanks', 'https://formspree.io/thanks/', 'https://formspree.io/thanks?language=en', 'https://formspree.io/thanks/?language=en', '/thanks', '/thanks/?language=en']) {
+        assert.equal(submissionAccepted(response(), { next }), true, 'rejected confirmed thanks response: ' + next);
+    }
+    for (const payload of [null, undefined, '', [], {}, { ok: true }, { next: 123 },
+        { next: 'https://formspree.io/thanks', errors: [{ message: 'Rejected' }] },
+        { next: 'https://formspree.io/thanks', error: 'Rejected' },
+        { next: 'https://formspree.io/thanks', ok: false }, { next: 'https://formspree.io/thanks', success: false },
+        ...['https://formspree.io/captcha', 'https://formspree.io/unknown', 'https://formspree.io/thanks/extra',
+            'http://formspree.io/thanks', 'https://evil.example/thanks', 'https://formspree.io.evil.example/thanks',
+            'javascript:alert(1)', '//evil.example/thanks'].map(next => ({ next }))]) {
+        assert.equal(submissionAccepted(response(), payload), false, 'accepted unconfirmed payload: ' + JSON.stringify(payload));
+    }
+    const payload = { next: 'https://formspree.io/thanks' };
+    for (const res of [null, response(payload, { ok: false, status: 422 }), response(payload, { redirected: true }),
+        response(payload, { headers: { get: () => 'text/html' } }), response(payload, { type: 'opaqueredirect', ok: false, status: 0 })]) {
+        assert.equal(submissionAccepted(res, payload), false, 'accepted failed/redirected/non-JSON response');
+    }
+});
+
+function fixture(config = {}) {
+    const formId = config.formId ?? 'testform';
+    const sitekey = config.sitekey ?? contact.byId('contact-captcha')?.attrs['data-sitekey'];
+    const fetchCalls = [], scripts = [], renders = [], resetCalls = [], controllers = [], states = [];
+    const pendingResponses = (config.responses || []).slice();
+    const timers = new Map();
+    let timerId = 0, token = '', resetCount = 0, nativeSubmissions = 0;
     function element(properties = {}) {
-        return Object.assign({
-            attributes: {}, listeners: new Map(),
+        const node = Object.assign({
+            attributes: {}, listeners: new Map(), dataset: {}, textContent: '',
+            classList: { add() {}, remove() {}, toggle() {} },
             addEventListener(name, listener) { this.listeners.set(name, listener); },
-            setAttribute(name, value) { this.attributes[name] = value; },
-            removeAttribute(name) { delete this.attributes[name]; }
+            setAttribute(name, value) { this.attributes[name] = String(value); },
+            removeAttribute(name) { delete this.attributes[name]; },
+            focus() {},
+            getBoundingClientRect() { return { width: config.width ?? 800 }; }
         }, properties);
+        Object.defineProperty(node, 'innerHTML', { set() { throw new Error('unsafe innerHTML assignment'); } });
+        return node;
     }
     const elements = {
         year: element({ textContent: '' }),
-        'contact-form': element({ dataset: { formspreeId: formId }, action: form.attrs.action }),
+        'contact-form': element({ dataset: { formspreeId: formId }, action: form.attrs.action,
+            checkValidity: () => config.valid !== false, reportValidity: () => config.valid !== false,
+            submit() { nativeSubmissions++; }, requestSubmit() { nativeSubmissions++; } }),
         'contact-fields': element({ disabled: true }),
         'contact-submit': element({ disabled: true, textContent: 'Send message' }),
-        'form-status': element({ textContent: 'Email fallback' }),
-        game: element({ value: 'general', options: options.map(value => ({ value })) })
+        'form-status': element({ textContent: 'Email fallback', dataset: new Proxy({}, { set(target, key, value) { states.push(value); target[key] = value; return true; } }) }),
+        'contact-captcha': element({ dataset: { sitekey } }),
+        game: element({ name: 'game', value: 'general', options: options.map(value => ({ value })) }),
+        name: element({ name: 'name', value: 'Sample name' }),
+        email: element({ name: 'email', value: 'sample@example.invalid' }),
+        message: element({ name: 'message', value: 'Keep this message until confirmed.' }),
+        topic: element({ name: 'topic', value: 'feedback' }),
+        website: element({ name: '_gotcha', value: '' })
     };
-    const window = element({ location: { search } });
-    vm.runInNewContext(source, { document: { getElementById: id => elements[id] || null }, window, URLSearchParams }, { timeout: 1000 });
-    return { elements, window, submit() {
-        const event = { defaultPrevented: false, preventDefault() { this.defaultPrevented = true; } };
-        elements['contact-form'].listeners.get('submit')?.(event);
-        return event;
-    } };
+    elements['contact-form'].reset = () => {
+        resetCount++;
+        for (const id of ['name', 'email', 'message', 'website']) elements[id].value = '';
+        elements.game.value = 'general'; elements.topic.value = 'feedback';
+    };
+    class FakeFormData extends Map {
+        constructor() {
+            super();
+            this.set('subject', 'Ksivok Games — website feedback');
+            this.set('_gotcha', elements.website.value);
+            if (!elements['contact-fields'].disabled) {
+                for (const id of ['name', 'email', 'message', 'game', 'topic']) this.set(id, elements[id].value);
+            }
+        }
+        append(name, value) { this.set(name, value); }
+    }
+    class FakeAbortController {
+        constructor() {
+            const listeners = new Set();
+            this.signal = { aborted: false, addEventListener: (name, callback) => { if (name === 'abort') listeners.add(callback); }, removeEventListener: (name, callback) => listeners.delete(callback) };
+            this.abort = () => { this.signal.aborted = true; for (const callback of listeners) callback(); };
+            controllers.push(this);
+        }
+    }
+    const captcha = {
+        render(target, settings) { renders.push({ target, settings }); return 0; },
+        getResponse(widget) { assert.equal(widget, 0); return token; },
+        reset(widget) { assert.equal(widget, 0); resetCalls.push(widget); token = ''; }
+    };
+    const window = element({ location: { search: config.search ?? '?game=gardenkin' }, innerWidth: config.width ?? 800,
+        setTimeout(callback, delay) { const id = ++timerId; timers.set(id, { callback, delay }); return id; },
+        clearTimeout(id) { timers.delete(id); },
+        fetch(url, init) {
+            fetchCalls.push({ url, init });
+            const next = pendingResponses.length ? pendingResponses.shift() : response();
+            return new Promise((resolve, reject) => {
+                const abort = () => reject(Object.assign(new Error('Aborted'), { name: 'AbortError' }));
+                init.signal?.addEventListener('abort', abort);
+                if (init.signal?.aborted) return abort();
+                Promise.resolve().then(() => typeof next === 'function' ? next() : next).then(resolve, reject);
+            });
+        }
+    });
+    const document = {
+        getElementById: id => config.withForm === false && id === 'contact-form' ? null : elements[id] || null,
+        createElement(tag) { assert.equal(tag, 'script'); return element(); },
+        head: { appendChild(script) { assert.equal(typeof window.onContactCaptchaReady, 'function', 'callback must exist before loading script'); scripts.push(script); } }
+    };
+    vm.runInNewContext(source, { document, window, URL, URLSearchParams, FormData: FakeFormData, AbortController: FakeAbortController }, { timeout: 1000 });
+    return {
+        elements, window, fetchCalls, scripts, renders, resetCalls, controllers, timers, states,
+        get resetCount() { return resetCount; }, get nativeSubmissions() { return nativeSubmissions; },
+        get token() { return token; },
+        snapshot() { return ['name', 'email', 'message', 'game', 'topic'].map(id => elements[id].value); },
+        ready() { window.grecaptcha = captcha; window.onContactCaptchaReady?.(); },
+        solve(value = 'synthetic-captcha-token') { token = value; renders.at(-1)?.settings.callback?.(value); },
+        expire() { token = ''; renders.at(-1)?.settings['expired-callback']?.(); },
+        captchaError() { token = ''; renders.at(-1)?.settings['error-callback']?.(); },
+        dispatch(name) { window.listeners.get(name)?.({ persisted: true }); },
+        fireTimers() { for (const [id, timer] of [...timers]) { timers.delete(id); timer.callback(); } },
+        startSubmit() {
+            const event = { defaultPrevented: false, preventDefault() { this.defaultPrevented = true; } };
+            const finished = Promise.resolve(elements['contact-form'].listeners.get('submit')?.(event));
+            finished.catch(() => {});
+            return { event, finished };
+        },
+        async submit() { const submission = this.startSubmit(); await submission.finished; await flush(); return submission.event; }
+    };
 }
 
-check('unconfigured/invalid forms stay disabled and prevent submission', () => {
-    for (const id of ['', 'https://evil.example', 'invalid-id']) {
-        const state = fixture(id, '?game=gardenkin&formspreeId=testform');
-        assert.equal(state.elements['contact-fields'].disabled, true);
-        assert.equal(state.elements['contact-submit'].disabled, true);
-        assert.equal(state.elements['contact-form'].action, form.attrs.action);
-        assert.equal(state.elements['form-status'].textContent, 'Email fallback');
-        state.window.listeners.get('pageshow')?.();
-        assert.equal(state.elements['contact-fields'].disabled, true);
-        assert.equal(state.elements['contact-submit'].disabled, true);
-        assert.equal(state.submit().defaultPrevented, true, 'unconfigured submit must be prevented');
+async function flush() { for (let count = 0; count < 16; count++) await Promise.resolve(); }
+function deferred() { let resolve; const promise = new Promise(done => { resolve = done; }); return { promise, resolve }; }
+function assertNoSuccess(state) { assert.ok(!state.states.includes('success'), 'unconfirmed response displayed success'); assert.equal(state.resetCount, 0, 'unconfirmed submission cleared form'); }
+
+check('CAPTCHA loads only on contact page and renders explicitly with public key', () => {
+    assert.equal(fixture({ withForm: false }).scripts.length, 0);
+    for (const width of [320, 800]) {
+        const state = fixture({ width });
+        assert.equal(state.elements['contact-submit'].disabled, true, 'submit must wait for CAPTCHA loader');
+        assert.equal(state.scripts.length, 1);
+        const loader = new URL(state.scripts[0].src);
+        assert.equal(loader.origin + loader.pathname, 'https://www.google.com/recaptcha/api.js');
+        assert.equal(loader.searchParams.get('onload'), 'onContactCaptchaReady');
+        assert.equal(loader.searchParams.get('render'), 'explicit');
+        state.ready();
+        assert.equal(state.renders.length, 1);
+        assert.equal(state.renders[0].target, state.elements['contact-captcha']);
+        const settings = state.renders[0].settings;
+        assert.equal(settings.sitekey, '6LfyqfMtAAAAACIZ49mRh02kqPGEuXETaKo37tCw');
+        assert.equal(settings.theme, 'dark');
+        assert.equal(settings.size, width < 360 ? 'compact' : 'normal');
+        for (const name of ['callback', 'expired-callback', 'error-callback']) assert.equal(typeof settings[name], 'function');
+        state.ready();
+        assert.equal(state.renders.length, 1, 'duplicate loader callback must not render another widget');
     }
 });
 
-check('configured form enables exact destination and safe prefill', () => {
-    const state = fixture('testform', '?game=gardenkin&action=https://evil.example&formspreeId=otherid');
-    assert.equal(state.elements['contact-form'].action, 'https://formspree.io/f/testform');
-    assert.equal(state.elements['contact-fields'].disabled, false);
-    assert.equal(state.elements['contact-submit'].disabled, false);
-    assert.equal(state.elements.game.value, 'gardenkin');
-    assert.match(state.elements.year.textContent, /^\d{4}$/);
-    assert.equal(fixture('testform', '?game=unknown').elements.game.value, 'general');
+check('invalid endpoint/missing key/loader failure cannot submit', async () => {
+    for (const id of ['', 'https://evil.example', 'invalid-id']) {
+        const state = fixture({ formId: id, search: '?game=gardenkin&formspreeId=testform' });
+        state.ready();
+        assert.equal(state.elements['contact-submit'].disabled, true);
+        assert.equal((await state.submit()).defaultPrevented, true);
+        assert.equal(state.fetchCalls.length, 0);
+        assertNoSuccess(state);
+    }
+    const noKey = fixture({ sitekey: '' });
+    noKey.ready();
+    assert.equal(noKey.renders.length, 0);
+    assert.equal(noKey.elements['contact-submit'].disabled, true);
+    assert.equal((await noKey.submit()).defaultPrevented, true);
+    assert.equal(noKey.fetchCalls.length, 0);
+    const failedLoader = fixture();
+    const loaderError = failedLoader.scripts[0].listeners.get('error') ?? failedLoader.scripts[0].onerror;
+    assert.equal(typeof loaderError, 'function', 'loader failure needs a handler');
+    loaderError();
+    failedLoader.dispatch('pageshow');
+    assert.equal(failedLoader.elements['contact-submit'].disabled, true);
+    assert.equal((await failedLoader.submit()).defaultPrevented, true);
+    assert.equal(failedLoader.fetchCalls.length, 0);
+    assertNoSuccess(failedLoader);
 });
 
-check('submit blocks duplicate sends and changed destinations; Back restores controls', () => {
-    const state = fixture('testform');
-    assert.equal(state.submit().defaultPrevented, false, 'valid native submission should proceed');
-    assert.equal(state.elements['contact-submit'].disabled, true);
-    assert.equal(state.elements['contact-form'].attributes['aria-busy'], 'true');
-    assert.equal(state.submit().defaultPrevented, true, 'second submit must be prevented');
-    state.window.listeners.get('pageshow')();
-    assert.equal(state.elements['contact-fields'].disabled, false);
-    assert.equal(state.elements['contact-submit'].disabled, false);
-    assert.equal(state.elements['contact-submit'].textContent, 'Send message');
-    assert.equal(state.elements['contact-form'].attributes['aria-busy'], undefined);
+check('native validation, unsolved/expired/error CAPTCHA, and action tampering block sends', async () => {
+    const invalid = fixture({ valid: false }); invalid.ready(); invalid.solve();
+    assert.equal((await invalid.submit()).defaultPrevented, true);
+    assert.equal(invalid.fetchCalls.length, 0);
+    const state = fixture(); state.ready();
+    const before = state.snapshot();
+    assert.equal((await state.submit()).defaultPrevented, true);
+    assert.equal(state.fetchCalls.length, 0);
+    for (const callback of ['expire', 'captchaError']) {
+        state.solve(); state[callback]();
+        await state.submit();
+        assert.equal(state.fetchCalls.length, 0, callback + ' token must not be used');
+    }
+    state.solve();
     for (const action of ['https://evil.example/steal', 'http://formspree.io/f/testform', 'https://formspree.io/f/otherid']) {
         state.elements['contact-form'].action = action;
-        assert.equal(state.submit().defaultPrevented, true, 'changed destination must be blocked: ' + action);
+        assert.equal((await state.submit()).defaultPrevented, true);
+        assert.equal(state.fetchCalls.length, 0);
+    }
+    assert.deepEqual(state.snapshot(), before);
+    assertNoSuccess(state);
+});
+
+check('AJAX includes token/fields, blocks duplicates, and resets only after confirmed success', async () => {
+    const waiting = deferred();
+    const state = fixture({ responses: [waiting.promise], search: '?game=gardenkin&action=https://evil.example&formspreeId=otherid' });
+    state.ready(); state.solve();
+    assert.equal(state.elements['contact-form'].action, 'https://formspree.io/f/testform');
+    const first = state.startSubmit();
+    assert.equal(first.event.defaultPrevented, true, 'AJAX must always cancel native submission');
+    await flush();
+    assert.equal(state.fetchCalls.length, 1);
+    const { url, init } = state.fetchCalls[0];
+    assert.equal(url, 'https://formspree.io/f/testform');
+    assert.equal(init.method.toUpperCase(), 'POST');
+    assert.equal(init.redirect, 'error');
+    assert.equal(init.credentials, 'omit');
+    assert.equal(init.headers.Accept ?? init.headers.accept ?? init.headers.get?.('Accept'), 'application/json');
+    assert.equal(init.body.get('g-recaptcha-response'), 'synthetic-captcha-token');
+    assert.equal(init.body.get('email'), 'sample@example.invalid', 'FormData must precede fieldset disabling');
+    assert.equal(init.body.get('message'), 'Keep this message until confirmed.');
+    assert.equal(init.body.get('game'), 'gardenkin');
+    assert.equal(state.elements['contact-fields'].disabled, true);
+    assert.equal(state.elements['contact-submit'].disabled, true);
+    assert.equal(state.elements['contact-form'].attributes['aria-busy'], 'true');
+    assertNoSuccess(state);
+    assert.equal((await state.submit()).defaultPrevented, true);
+    assert.equal(state.fetchCalls.length, 1);
+    waiting.resolve(response());
+    await first.finished; await flush();
+    assert.equal(state.elements['form-status'].dataset.state, 'success');
+    assert.equal(state.resetCount, 1);
+    assert.equal(state.elements.message.value, '');
+    assert.equal(state.elements.game.value, 'gardenkin', 'reset must preserve game prefill');
+    assert.ok(state.resetCalls.length >= 1);
+    assert.equal(state.token, '');
+    assert.equal(state.elements['contact-fields'].disabled, false);
+    assert.equal(state.elements['contact-form'].attributes['aria-busy'], undefined);
+    assert.equal(state.nativeSubmissions, 0);
+    assert.equal(state.timers.size, 0, 'settled requests must clear timeout');
+});
+
+check('server/network/JSON/redirect errors preserve input and allow a fresh CAPTCHA retry', async () => {
+    const failures = [
+        response({ errors: [{ message: '<img src=x onerror=alert(1)>' }] }, { ok: false, status: 422 }),
+        response({ next: 'https://formspree.io/captcha' }), response({ next: 'https://formspree.io/unknown' }),
+        response({}), response({ next: 'https://formspree.io/thanks', success: false }),
+        response(undefined, { redirected: true }), response(undefined, { headers: { get: () => 'text/html' } }),
+        response(undefined, { json: async () => { throw new SyntaxError('Invalid JSON'); } }),
+        () => { throw new TypeError('Network unavailable'); }
+    ];
+    for (const failure of failures) {
+        const state = fixture({ responses: [failure, response()] });
+        state.ready(); state.solve();
+        const before = state.snapshot();
+        assert.equal((await state.submit()).defaultPrevented, true);
+        assert.equal(state.fetchCalls.length, 1);
+        assert.deepEqual(state.snapshot(), before);
+        assertNoSuccess(state);
+        assert.equal(state.elements['contact-fields'].disabled, false);
+        assert.ok(state.resetCalls.length >= 1, 'failed attempt must reset CAPTCHA');
+        assert.equal(state.token, '');
+        await state.submit();
+        assert.equal(state.fetchCalls.length, 1, 'retry must require a fresh CAPTCHA token');
+        state.solve('new-captcha-token');
+        await state.submit();
+        assert.equal(state.fetchCalls.length, 2);
+        assert.equal(state.fetchCalls[1].init.body.get('g-recaptcha-response'), 'new-captcha-token');
+        assert.equal(state.elements['form-status'].dataset.state, 'success');
+        assert.equal(state.nativeSubmissions, 0);
+        assert.equal(state.timers.size, 0);
     }
 });
 
-console.log(`Site checks: ${passed} passed, ${failed} failed; ${checkedLinks} local references checked. No browser or network requests used.`);
-process.exitCode = failed ? 1 : 0;
+check('timeouts abort pending work without success or input loss', async () => {
+    const state = fixture({ responses: [new Promise(() => {})] });
+    state.ready(); state.solve();
+    const before = state.snapshot();
+    const submission = state.startSubmit();
+    await flush();
+    assert.equal(state.fetchCalls.length, 1);
+    assert.ok(state.timers.size > 0, 'missing timeout');
+    state.fireTimers();
+    await submission.finished; await flush();
+    assert.ok(state.controllers.some(controller => controller.signal.aborted));
+    assert.deepEqual(state.snapshot(), before);
+    assertNoSuccess(state);
+    assert.equal(state.elements['contact-fields'].disabled, false);
+    assert.equal(state.token, '');
+});
+
+check('pagehide abort and pageshow recovery retain unsent input without inventing success', async () => {
+    const state = fixture({ responses: [new Promise(() => {}), response()] });
+    state.ready(); state.solve();
+    const before = state.snapshot();
+    const submission = state.startSubmit();
+    await flush();
+    state.dispatch('pagehide');
+    await submission.finished; await flush();
+    assert.ok(state.controllers.some(controller => controller.signal.aborted));
+    state.dispatch('pageshow');
+    assert.deepEqual(state.snapshot(), before);
+    assertNoSuccess(state);
+    assert.equal(state.elements['contact-fields'].disabled, false);
+    state.solve('after-back-token');
+    await state.submit();
+    assert.equal(state.fetchCalls.length, 2);
+    assert.equal(state.elements['form-status'].dataset.state, 'success');
+});
+
+/*
+ * Deliberately no live submission or browser checks. The small DOM/CAPTCHA/fetch
+ * fakes verify local state transitions; they cannot verify provider deployment,
+ * CAPTCHA domain registration, network delivery, or inbox receipt.
+ */
+
+async function main() {
+    for (const { name, run } of cases) {
+        try { await run(); passed++; console.log('PASS ' + name); }
+        catch (error) { failed++; console.error('FAIL ' + name + ': ' + error.message); }
+    }
+    console.log(`Site checks: ${passed} passed, ${failed} failed; ${checkedLinks} local references checked. No browser or network requests used.`);
+    process.exitCode = failed ? 1 : 0;
+}
+main().catch(error => { console.error(error); process.exitCode = 1; });
