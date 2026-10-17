@@ -6,16 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ksivok Games</title>
     <meta name="description"
-        content="Discover exciting games by Andrey - Chicken Yeet, Magnet Sort, Find A Letter, Memory Pairs Game, and Roblox experiences.">
+        content="Discover indie games by Andrey: Gardenkin, a cozy garden restoration game in development, plus mobile games, web games, and Roblox experiences.">
     <meta name="keywords"
-        content="mobile games, web games, chicken yeet, gamemonetize, magnet sort, playgama, android games, find a letter, memory pairs, roblox, ksivok games">
+        content="gardenkin, cozy garden game, indie games, mobile games, web games, chicken yeet, magnet sort, android games, roblox, ksivok games">
     <meta property="og:title" content="Ksivok Games">
     <meta property="og:description"
-        content="Discover exciting games by Andrey - Chicken Yeet, Magnet Sort, Find A Letter, Memory Pairs Game, and Roblox experiences.">
+        content="Discover Gardenkin, a cozy garden restoration game in development, and more independent games by Andrey.">
     <meta property="og:image" content="game1.png">
     <meta property="og:url" content="https://ksivok-games.org">
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="stylesheet" href="style.css?v=1.3">
+    <link rel="stylesheet" href="style.css?v=1.4">
     <link rel="icon" href="/favicon.png" type="image/png">
     <meta name="google-site-verification" content="waR8D4ip7t6BubK5UE8GR7LkjRyi_qyG5uVl_xgybJM" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,6 +25,7 @@
 </head>
 
 <body>
+    <a class="skip-link" href="#main">Skip to content</a>
     <nav class="navbar">
         <div class="nav-content">
             <div class="logo">
@@ -32,20 +33,23 @@
                 <span>KSIVOK GAMES</span>
             </div>
             <div class="nav-links">
+                <a href="gardenkin.html">Gardenkin</a>
                 <a href="#games">Games</a>
                 <a href="#about">About</a>
+                <a href="contact.html">Contact</a>
                 <a href="privacy.html">Privacy</a>
                 <a href="monster-chain-privacy.html">Monster Chain Privacy</a>
             </div>
         </div>
     </nav>
 
+    <main id="main">
     <section class="hero" id="about">
         <div style="text-align: center;">
             <div class="hero-content">
                 <div class="hero-text">
                     <h1>Hi! I'm Andrey, a Project Manager by day and indie game developer by night.</h1>
-                    <p>Welcome! Here I share the mobile apps, web games, and Roblox experiences I build in my free time.
+                    <p>Welcome! Here I share the PC, mobile, web, and Roblox games I build in my free time.
                     </p>
                     <p>From brain-teasing puzzles to exciting multiplayer worlds — explore around and find your next
                         favorite game!</p>
@@ -61,6 +65,17 @@
     <section class="games" id="games">
         <h2>MY GAMES</h2>
         <div class="games-grid">
+            <h3 class="platform-title">IN DEVELOPMENT · PC</h3>
+            <article class="game-card featured-game">
+                <div class="garden-title-panel" aria-hidden="true"><span class="garden-symbol">✿</span><span class="garden-wordmark">GARDENKIN</span><span>Grow a garden. Bring people together.</span></div>
+                <div class="game-info">
+                    <span class="status-badge">In development</span>
+                    <h2>Gardenkin</h2>
+                    <p>Bring an overgrown community garden back to life. Grow crops, restore forgotten corners by hand, meet your neighbours, and team up with little animal helpers in this cozy single-player game.</p>
+                    <p class="form-note">Windows / PC · Planned Steam release · English &amp; Russian</p>
+                    <div class="game-buttons"><a class="web-button garden-button" href="gardenkin.html">DISCOVER GARDENKIN</a><a class="text-link" href="contact.html?game=gardenkin">Questions &amp; feedback</a></div>
+                </div>
+            </article>
             <h3 class="platform-title">MOBILE</h3>
             <div class="game-card">
                 <div class="game-image">
@@ -213,10 +228,12 @@
         </div>
     </section>
 
+    </main>
     <footer>
         <div class="footer-content">
             <div class="footer-section">
                 <h3>Contact</h3>
+                <p><a href="contact.html">Contact &amp; feedback form</a></p>
                 <p>Email: <a href="mailto:ksivok@gmail.com">ksivok@gmail.com</a></p>
             </div>
             <div class="footer-section">
@@ -237,9 +254,7 @@
             <p>&copy; <span id="year"></span> Ksivok Games. All rights reserved.</p>
         </div>
     </footer>
-    <script>
-        document.getElementById('year').textContent = new Date().getFullYear();
-    </script>
+    <script src="site.js" defer></script>
 </body>
 
 </html>

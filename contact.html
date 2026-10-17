@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self'; form-action https://formspree.io; base-uri 'none'; object-src 'none'; upgrade-insecure-requests">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>Contact &amp; Feedback | Ksivok Games</title>
+    <meta name="description" content="Send Ksivok Games a question, game suggestion, or bug report. Contact the developer of Gardenkin and other independent games.">
+    <link rel="canonical" href="https://ksivok-games.org/contact.html">
+    <link rel="stylesheet" href="style.css?v=1.4">
+    <link rel="icon" href="favicon.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="site-page contact-page">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <nav class="navbar" aria-label="Main navigation">
+        <div class="nav-content">
+            <a class="logo brand-link" href="index.html"><img src="logo.svg" alt=""><span>KSIVOK GAMES</span></a>
+            <div class="nav-links"><a href="gardenkin.html">Gardenkin</a><a href="index.html#games">Games</a><a href="index.html#about">About</a><a href="contact.html" aria-current="page">Contact</a><a href="privacy.html">Privacy</a></div>
+        </div>
+    </nav>
+    <main class="page-main" id="main">
+        <header class="page-intro"><p class="eyebrow">A direct line to the developer</p><h1>Let's talk games</h1><p class="page-lead">Found a bug, have an idea, or just want to say hello? I'd love to hear from you.</p></header>
+        <div class="contact-grid">
+            <section class="contact-panel" aria-labelledby="form-title">
+                <h2 id="form-title">Send a message</h2>
+                <p class="form-note">English and Russian are both welcome. Fields marked * are required.</p>
+                <!-- Public Formspree endpoint supplied by the owner. Never add API keys or passwords. -->
+                <form id="contact-form" data-formspree-id="xkjoygov" action="https://formspree.io/f/xkjoygov" method="post" accept-charset="UTF-8" aria-describedby="form-status form-privacy">
+                    <input type="hidden" name="subject" value="Ksivok Games — website feedback">
+                    <div class="form-honeypot" aria-hidden="true"><label for="website">Leave this field empty</label><input type="text" id="website" name="_gotcha" tabindex="-1" autocomplete="off"></div>
+                    <fieldset id="contact-fields" class="form-fields" disabled>
+                        <legend class="visually-hidden">Your message</legend>
+                        <div class="form-row">
+                            <div class="form-field"><label for="name">Your name <span class="optional">(optional)</span></label><input id="name" name="name" type="text" autocomplete="name" maxlength="80"></div>
+                            <div class="form-field"><label for="email">Your email *</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" required aria-describedby="email-help"><small id="email-help">So I can reply to you.</small></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-field"><label for="game">Which game?</label><select id="game" name="game"><option value="general">General / other</option><option value="gardenkin">Gardenkin</option><option value="chicken-yeet">Chicken Yeet</option><option value="magnet-sort">Magnet Sort</option><option value="find-a-letter">Find A Letter</option><option value="memory-pairs">Match All Pairs</option><option value="museum-night-shift">Museum Night Shift</option><option value="oddwish-well">Oddwish Well</option><option value="roblox">Roblox games</option></select></div>
+                            <div class="form-field"><label for="topic">What is it about?</label><select id="topic" name="topic"><option value="feedback">Feedback / idea</option><option value="bug">Bug report</option><option value="question">Question</option><option value="business">Business enquiry</option><option value="privacy">Privacy / data request</option></select></div>
+                        </div>
+                        <div class="form-field"><label for="message">Your message *</label><textarea id="message" name="message" rows="8" maxlength="5000" required aria-describedby="message-help"></textarea><small id="message-help">For a bug report, please include your device, game version, and what happened. Up to 5,000 characters.</small></div>
+                        <button id="contact-submit" type="submit" class="web-button" disabled>Send message</button>
+                    </fieldset>
+                    <p id="form-status" class="form-status" role="status" aria-live="polite">Loading the contact form. If it does not become available, please email <a href="mailto:ksivok@gmail.com">ksivok@gmail.com</a>.</p>
+                    <noscript><p class="form-note">Please enable JavaScript to use the form, or email <a href="mailto:ksivok@gmail.com">ksivok@gmail.com</a> directly.</p></noscript>
+                    <p id="form-privacy" class="form-note privacy-note">Submitting opens Formspree's secure submission page, where a spam check may be requested. Your email, message, and any optional details are processed and stored by Formspree and emailed to Ksivok Games to handle your enquiry. Please do not send passwords, payment information, or other sensitive data. See our <a href="privacy.html#website-contact">contact privacy information</a> and <a href="https://formspree.io/legal/privacy-policy/" target="_blank" rel="noopener noreferrer">Formspree's privacy policy</a>.</p>
+                </form>
+            </section>
+            <aside class="contact-aside" aria-labelledby="email-title"><div class="contact-panel"><p class="eyebrow">Prefer your email app?</p><h2 id="email-title">Write directly</h2><a class="email-link" href="mailto:ksivok@gmail.com">ksivok@gmail.com</a><p>Questions about Gardenkin, feedback on any of my games, and collaboration ideas are all welcome.</p></div><div class="contact-panel"><h2>A useful bug report</h2><ul class="feature-list"><li>Game name and version, if you know it.</li><li>Your device and operating system.</li><li>Steps to reproduce the problem.</li><li>What you expected, and what happened instead.</li></ul><p class="form-note">There are no file uploads on this form. If a screenshot would help, mention it and I can follow up by email.</p></div></aside>
+        </div>
+    </main>
+    <footer><div class="footer-content"><div class="footer-section"><h3>Ksivok Games</h3><p>Independent games by Andrey.</p><p><a href="index.html#games">Explore all games</a></p></div><div class="footer-section"><h3>Information</h3><p><a href="gardenkin.html">Gardenkin</a></p><p><a href="privacy.html">Privacy policy</a></p></div></div><div class="footer-bottom"><p>&copy; <span id="year"></span> Ksivok Games. All rights reserved.</p></div></footer>
+    <script src="site.js" defer></script>
+</body>
+</html>
