@@ -1,3 +1,6 @@
+/* Fredoka (SIL OFL) — заголовки, тот же шрифт, что в Gardenkin */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&display=swap');
+
 @font-face {
     font-family: 'Digitalt';
     src: url('fonts/digitalt.woff2') format('woff2'),
@@ -31,10 +34,15 @@ body {
     background-color: var(--primary-color);
 }
 
-/* Применяем Digitalt только к заголовкам и логотипу */
-.logo, h1, h2, h3, .nav-links a {
+/* Digitalt — только логотип студии и меню; заголовки — Fredoka: жирный Digitalt заглавными сливается */
+.logo, .nav-links a {
     font-family: 'Digitalt', sans-serif;
     text-transform: uppercase;
+}
+
+h1, h2, h3 {
+    font-family: 'Fredoka', 'Roboto', sans-serif;
+    font-weight: 600;
 }
 
 /* Navbar */
@@ -463,7 +471,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .game-tags span, .status-badge { display: inline-block; padding: 0.35rem 0.75rem; border: 1px solid #526c57; border-radius: 100px; color: #c8edbb; font-size: 0.85rem; font-weight: 700; }
 .status-badge { margin-bottom: 1rem; }
 .garden-card-art { display: block; min-height: 320px; background: #172d28; }
-.garden-card-art img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: left center; }
+.garden-card-art img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
 .garden-button, .garden-button:visited { background: #b5e5ab; color: #132b1c !important; box-shadow: none; }
 .garden-button:hover { background: #c8edbb; color: #132b1c !important; box-shadow: 0 4px 16px #0003; }
 .featured-game { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: stretch; }
@@ -516,7 +524,7 @@ button.web-button:disabled { opacity: 0.55; cursor: not-allowed; transform: none
     [id] { scroll-margin-top: 13rem; }
     .featured-game, .feature-grid, .form-row { grid-template-columns: 1fr; }
     .featured-game .game-info { padding: 1.5rem; }
-    .garden-card-art { min-height: 0; aspect-ratio: 920 / 430; }
+    .garden-card-art { min-height: 0; aspect-ratio: 3 / 2; }
     .garden-copy .game-buttons { justify-content: flex-start; }
     .contact-panel, .feature-panel, .release-panel { padding: 1.25rem; }
     .page-section { margin-top: 3rem; }
