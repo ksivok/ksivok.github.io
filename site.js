@@ -48,10 +48,11 @@
     const endpoint = formEndpoint(form.dataset.formspreeId);
     const sitekey = captcha?.dataset.sitekey;
     const configured = endpoint && typeof sitekey === 'string' && /^[A-Za-z0-9_-]{20,100}$/.test(sitekey);
-    let widgetId = null;
+    let captchaReady = false;
     let submitting = false;
     let captchaFailed = false;
     let controller = null;
+    let loadTimeout = null;
 
     const game = selectedGame(window.location.search,
         Array.from(gameSelect.options, option => option.value));
@@ -63,42 +64,48 @@
         if (focus && typeof status.focus === 'function') status.focus();
     }
 
-    function resetCaptcha() {
-        if (widgetId !== null && window.grecaptcha) {
-            try { window.grecaptcha.reset(widgetId); }
-            catch (_) { captchaFailed = true; }
-        }
+    function withAbort(promise, signal) {
+        return new Promise(function (resolve, reject) {
+            const abort = () => reject(new Error('Request interrupted'));
+            if (signal.aborted) abort();
+            else signal.addEventListener('abort', abort, { once: true });
+            Promise.resolve(promise).then(function (value) {
+                signal.removeEventListener('abort', abort);
+                resolve(value);
+            }, function (error) {
+                signal.removeEventListener('abort', abort);
+                reject(error);
+            });
+        });
     }
 
     form.addEventListener('submit', async function (event) {
         // Always stay on this page. Only the provider's final JSON acceptance is success.
         event.preventDefault();
-        if (!configured || form.action !== endpoint || submitting || button.disabled) return;
+        if (!configured || form.action !== endpoint || submitting || button.disabled || !captchaReady) return;
         if (typeof form.reportValidity === 'function' && !form.reportValidity()) return;
-
-        let token = '';
-        try {
-            if (widgetId !== null && window.grecaptcha) token = window.grecaptcha.getResponse(widgetId);
-        } catch (_) { /* Treat an unavailable CAPTCHA as unverified. */ }
-        if (typeof token !== 'string' || !token.trim()) {
-            showStatus('Please complete the CAPTCHA before sending your message.', 'error', true);
-            return;
-        }
 
         // Collect before disabling the fieldset: disabled fields are omitted from FormData.
         const data = new FormData(form);
-        data.set('g-recaptcha-response', token);
         submitting = true;
         fields.disabled = true;
         button.disabled = true;
-        button.textContent = 'Sending…';
+        button.textContent = 'Checking…';
         form.setAttribute('aria-busy', 'true');
-        showStatus('Sending your message. Please wait for confirmation.', 'pending');
+        showStatus('Running the spam check. Your message has not been sent yet.', 'pending');
         controller = new AbortController();
         const request = controller;
         const timeout = window.setTimeout(() => request.abort(), 25000);
+        let posted = false;
         try {
-            const response = await window.fetch(endpoint, {
+            // v3 tokens expire and are single-use: obtain one only for this submission.
+            const token = await withAbort(window.grecaptcha.execute(sitekey, { action: 'submit' }), request.signal);
+            if (request.signal.aborted || typeof token !== 'string' || !token.trim()) throw new Error('Spam check failed');
+            data.set('g-recaptcha-response', token);
+            button.textContent = 'Sending…';
+            showStatus('Sending your message. Please wait for confirmation.', 'pending');
+            posted = true;
+            const response = await withAbort(window.fetch(endpoint, {
                 method: 'POST',
                 mode: 'cors',
                 body: data,
@@ -106,8 +113,8 @@
                 credentials: 'omit',
                 redirect: 'error',
                 signal: request.signal
-            });
-            const payload = await response.json();
+            }), request.signal);
+            const payload = await withAbort(response.json(), request.signal);
             if (request.signal.aborted) throw new Error('Request interrupted');
             if (submissionAccepted(response, payload)) {
                 form.reset();
@@ -119,21 +126,21 @@
                     : typeof payload?.error === 'string' ? [payload.error] : [];
                 const detail = messages.join(' ').slice(0, 500);
                 showStatus(detail
-                    ? 'Please check your message: ' + detail + ' Your text has been kept. Complete the CAPTCHA again before retrying.'
+                    ? 'Please check your message: ' + detail + ' Your text has been kept. A new spam check will run when you retry.'
                     : 'The service could not accept your message. Your text has been kept. Please try later or email ksivok@gmail.com.', 'error', true);
             } else {
                 showStatus('We could not confirm that your message was accepted. Your text has been kept. Please wait before retrying, or email ksivok@gmail.com.', 'error', true);
             }
         } catch (_) {
-            showStatus('We could not confirm that your message was sent. Your text has been kept. Please wait before retrying, check your connection, or email ksivok@gmail.com.', 'error', true);
+            showStatus(posted
+                ? 'We could not confirm that your message was sent. Your text has been kept. Please wait before retrying, check your connection, or email ksivok@gmail.com.'
+                : 'The spam check could not complete, so your message was not sent. Your text has been kept. Please try again or email ksivok@gmail.com.', 'error', true);
         } finally {
             window.clearTimeout(timeout);
             controller = null;
-            // Tokens are single-use, including after server rejection or an uncertain request.
-            resetCaptcha();
             submitting = false;
             fields.disabled = false;
-            button.disabled = widgetId === null || captchaFailed;
+            button.disabled = !captchaReady || captchaFailed;
             button.textContent = 'Send message';
             form.removeAttribute('aria-busy');
         }
@@ -147,6 +154,8 @@
 
     function captchaError() {
         captchaFailed = true;
+        captchaReady = false;
+        window.clearTimeout(loadTimeout);
         if (!submitting) {
             button.disabled = true;
             showStatus('The CAPTCHA could not load. Your text is still here. Please reload the page or email ksivok@gmail.com directly.', 'error');
@@ -154,44 +163,34 @@
     }
 
     window.onContactCaptchaReady = function () {
-        if (widgetId !== null) return;
+        if (captchaReady || captchaFailed) return;
         try {
-            const width = captcha.getBoundingClientRect?.().width || 0;
-            widgetId = window.grecaptcha.render(captcha, {
-                sitekey,
-                theme: 'dark',
-                size: width > 0 && width < 360 ? 'compact' : 'normal',
-                callback: function () {
-                    captchaFailed = false;
-                    if (!submitting) {
-                        button.disabled = false;
-                        showStatus('Verification complete. Your message is ready to send.', 'info');
-                    }
-                },
-                'expired-callback': function () {
-                    if (!submitting) showStatus('The CAPTCHA has expired. Please complete it again before sending.', 'error');
-                },
-                'error-callback': captchaError
+            window.grecaptcha.ready(function () {
+                if (captchaFailed) return;
+                if (typeof window.grecaptcha.execute !== 'function') { captchaError(); return; }
+                window.clearTimeout(loadTimeout);
+                captchaReady = true;
+                button.disabled = submitting;
+                if (!submitting) showStatus('Spam protection is ready. Send your message to receive confirmation here.', 'info');
             });
-            captchaFailed = false;
-            button.disabled = false;
-            showStatus('Complete the CAPTCHA, then send your message. You will see confirmation here.', 'info');
         } catch (_) { captchaError(); }
     };
 
     // Define the callback before loading Google's API to avoid script-loading races.
     const script = document.createElement('script');
-    script.src = 'https://www.google.com/recaptcha/api.js?onload=onContactCaptchaReady&render=explicit';
+    // Formspree verifies v3 with the matching legacy secret configured in its dashboard.
+    script.src = 'https://www.google.com/recaptcha/api.js?onload=onContactCaptchaReady&render=' + encodeURIComponent(sitekey);
     script.async = true;
     script.defer = true;
     script.addEventListener('error', captchaError);
+    loadTimeout = window.setTimeout(captchaError, 15000);
     document.head.appendChild(script);
 
     window.addEventListener('pageshow', function () {
         // History restoration is not evidence of delivery; never clear or invent success here.
         if (!submitting) {
             fields.disabled = false;
-            button.disabled = widgetId === null || captchaFailed;
+            button.disabled = !captchaReady || captchaFailed;
             button.textContent = 'Send message';
             form.removeAttribute('aria-busy');
         }
